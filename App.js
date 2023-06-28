@@ -12,6 +12,8 @@ import { Provider } from "react-redux";
 import Store from "./Store/store";
 import Details from "./Screens/Details";
 import SearchScreen from "./Screens/SearchScreen";
+import { persistStore } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -66,22 +68,25 @@ const BottomTabNavigator = () => {
   );
 };
 
+let persistor = persistStore(Store);
 export default function App() {
   const animation = ["slide_from_right", "slide_from_left"];
   return (
     <>
       <Provider store={Store}>
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-              animation: "slide_from_right",
-            }}
-          >
-            <Stack.Screen name="Main" component={BottomTabNavigator} />
-            <Stack.Screen name="Details" component={Details} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <PersistGate persistor={persistor}>
+          <NavigationContainer>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+                animation: "slide_from_right",
+              }}
+            >
+              <Stack.Screen name="Main" component={BottomTabNavigator} />
+              <Stack.Screen name="Details" component={Details} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </PersistGate>
       </Provider>
     </>
   );

@@ -113,6 +113,7 @@ const initialState = {
   animeInfo: { loading: false, error: null, data: {} },
   searchData: { loading: false, error: null, data: {} },
   favourites: [],
+  recentFive: [],
 };
 
 const animeSlice = createSlice({
@@ -123,7 +124,7 @@ const animeSlice = createSlice({
       state.searchData.data = {};
     },
     toggleFavourite: (state, action) => {
-      const isFav = state.favourites.findIndex((anime) => {
+      const isFav = state.favourites?.findIndex((anime) => {
         return anime.id === action.payload.id;
       });
 
@@ -136,6 +137,26 @@ const animeSlice = createSlice({
         state.favourites = newFavList;
       }
       console.log(state.favourites);
+    },
+    addToRecentFive: (state, action) => {
+      // console.log(state);
+      state.recentFive.push(action.payload);
+      const index = state.recentFive?.findIndex(
+        (show) => show.id === action.payload.id
+      );
+      if (index === -1) {
+        state.recentFive?.unshift(action.payload);
+      } else {
+        state.recentFive = [
+          action.payload,
+          ...state.recentFive?.slice(0, index),
+          ...state.recentFive?.slice(index + 1),
+        ];
+      }
+      if (state.recentFive.length > 5) {
+        state.recentFive = state.recentFive.slice(0, 5);
+      }
+      console.log(state.recentFive);
     },
   },
   extraReducers: (builder) => {
@@ -202,4 +223,5 @@ export default animeSlice.reducer;
 //   updateServer,
 //   updateQuality,
 // } = animeSlice.actions;
-export const { resetSearchData, toggleFavourite } = animeSlice.actions;
+export const { resetSearchData, toggleFavourite, addToRecentFive } =
+  animeSlice.actions;

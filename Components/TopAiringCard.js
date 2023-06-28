@@ -1,7 +1,11 @@
 import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAnimeInfo, toggleFavourite } from "../Slices/animeSlice";
+import {
+  addToRecentFive,
+  fetchAnimeInfo,
+  toggleFavourite,
+} from "../Slices/animeSlice";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -15,6 +19,7 @@ export default function TopAiringCard({ id, title, image, url, genres }) {
 
   const handlePress = () => {
     dispatch(fetchAnimeInfo({ id }));
+    dispatch(addToRecentFive({ id, title, image, genres }));
     navigation.navigate("Details");
   };
 
