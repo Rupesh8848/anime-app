@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./Screens/HomeScreen";
 import FavouriteScreen from "./Screens/FavouriteScreen";
-import ProfileScreen from "./Screens/ProfileScreen";
+// import ProfileScreen from "./Screens/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
@@ -45,7 +45,7 @@ const BottomTabNavigator = () => {
         }}
       />
       <BottomTab.Screen
-        name="Favourite"
+        name="Your Favourites"
         component={FavouriteScreen}
         options={{
           tabBarIcon: ({ focused, color, size }) => {
@@ -53,7 +53,7 @@ const BottomTabNavigator = () => {
           },
         }}
       />
-      <BottomTab.Screen
+      {/* <BottomTab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
@@ -61,7 +61,7 @@ const BottomTabNavigator = () => {
             return <Fontisto name="person" size={24} color={color} />;
           },
         }}
-      />
+      /> */}
     </BottomTab.Navigator>
   );
 };
