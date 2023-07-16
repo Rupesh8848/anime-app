@@ -12,28 +12,34 @@ import { fetchSearchAnime } from "../Slices/animeSlice";
 import TopAiringCard from "../Components/TopAiringCard";
 import { ScrollView } from "react-native";
 import { FlatList } from "react-native";
+import { current } from "@reduxjs/toolkit";
 
 export default function SearchScreen() {
   const [searchKey, setSearchKey] = React.useState("");
-  const [pageNumber, setPageNumber] = React.useState(1);
-  console.log(searchKey);
-
   const dispatch = useDispatch();
 
-  const { hasNextPage, results } = useSelector(
+  const { hasNextPage, results, currentPage } = useSelector(
     (state) => state?.animeReducer?.searchData?.data
   );
 
-  //   console.log(results);
+  console.log("Current Page: ", currentPage);
 
   const searchHandler = () => {
-    setPageNumber(1);
-    dispatch(fetchSearchAnime({ query: searchKey, pageNum: pageNumber }));
+    dispatch(fetchSearchAnime({ query: searchKey, pageNum: 1 }));
   };
 
   const nextClickHanlder = () => {
-    dispatch(fetchSearchAnime({ query: searchKey, pageNum: pageNumber + 1 }));
-    setPageNumber(pageNumber + 1);
+    // dispatch(
+    //   fetchSearchAnime({ query: searchKey, pageNum: +currentPage[0] + 1 })
+    // );
+    dispatch(
+      fetchSearchAnime({ query: searchKey, pageNum: +currentPage[0] + 1 })
+    );
+  };
+  const prevClickHanlder = () => {
+    dispatch(
+      fetchSearchAnime({ query: searchKey, pageNum: +currentPage[0] - 1 })
+    );
   };
 
   return (
@@ -68,61 +74,51 @@ export default function SearchScreen() {
             </View>
           </View>
 
-          <ScrollView>
-            <View style={styles.searchResult}>
-              {/* {results?.map((result) => (
+          <View style={styles.searchResult}>
+            <FlatList
+              data={results}
+              extraData={results}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
                 <TopAiringCard
-                  id={result.id}
-                  image={result.image}
-                  title={result.title}
-                  key={result.id}
-                  genres={[result.releaseDate, result.subOrDub]}
+                  id={item.id}
+                  image={item.image}
+                  title={item.title}
+                  key={item.id}
+                  genres={[item.releaseDate, item.subOrDub]}
                 />
-              ))} */}
+              )}
+            />
+          </View>
 
-              <FlatList
-                data={results}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <TopAiringCard
-                    id={item.id}
-                    image={item.image}
-                    title={item.title}
-                    key={item.id}
-                    genres={[item.releaseDate, item.subOrDub]}
-                  />
-                )}
-              />
+          <View style={styles.buttonsContainer}>
+            {currentPage && parseInt(currentPage[0]) > 1 && (
+              <Pressable
+                onPress={prevClickHanlder}
+                style={styles.nextButton}
+                android_ripple={{
+                  foreground: true,
+                  color: "rgba(0,0,0,0.5)",
+                }}
+              >
+                <Text>{"<< Prev"}</Text>
+              </Pressable>
+            )}
 
-              <View style={styles.buttonsContainer}>
-                {pageNumber > 1 && (
-                  <Pressable
-                    onPress={nextClickHanlder}
-                    style={styles.nextButton}
-                    android_ripple={{
-                      foreground: true,
-                      color: "rgba(0,0,0,0.5)",
-                    }}
-                  >
-                    <Text>{"<< Prev"}</Text>
-                  </Pressable>
-                )}
-
-                {hasNextPage && (
-                  <Pressable
-                    onPress={nextClickHanlder}
-                    style={styles.nextButton}
-                    android_ripple={{
-                      foreground: true,
-                      color: "rgba(0,0,0,0.5)",
-                    }}
-                  >
-                    <Text>{"Next >>"}</Text>
-                  </Pressable>
-                )}
-              </View>
-            </View>
-          </ScrollView>
+            {hasNextPage && (
+              <Pressable
+                onPress={nextClickHanlder}
+                style={styles.nextButton}
+                android_ripple={{
+                  foreground: true,
+                  color: "rgba(0,0,0,0.5)",
+                }}
+              >
+                <Text>{"Next >>"}</Text>
+              </Pressable>
+            )}
+          </View>
+          {/* </ScrollView> */}
         </View>
       </LinearGradient>
     </SafeAreaView>
@@ -166,7 +162,12 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
   },
   mainContainer: {},
-  searchResult: { height: "100%", alignItems: "center" },
+  searchResult: {
+    height: "100%",
+    alignItems: "center",
+    height: "85%",
+    paddingBottom: 30,
+  },
   gradient: { height: Dimensions.get("window").height },
   nextButton: {
     backgroundColor: "#FFF0e3",
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
-    paddingLeft: 20,
-    marginBottom: 150,
+    position: "absolute",
+    bottom: 20,
   },
 });

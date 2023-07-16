@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./Screens/HomeScreen";
 import FavouriteScreen from "./Screens/FavouriteScreen";
-import ProfileScreen from "./Screens/ProfileScreen";
+// import ProfileScreen from "./Screens/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
@@ -12,6 +12,8 @@ import { Provider } from "react-redux";
 import Store from "./Store/store";
 import Details from "./Screens/Details";
 import SearchScreen from "./Screens/SearchScreen";
+import { persistStore } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
@@ -45,7 +47,7 @@ const BottomTabNavigator = () => {
         }}
       />
       <BottomTab.Screen
-        name="Favourite"
+        name="Your Favourites"
         component={FavouriteScreen}
         options={{
           tabBarIcon: ({ focused, color, size }) => {
@@ -53,7 +55,7 @@ const BottomTabNavigator = () => {
           },
         }}
       />
-      <BottomTab.Screen
+      {/* <BottomTab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
@@ -61,27 +63,30 @@ const BottomTabNavigator = () => {
             return <Fontisto name="person" size={24} color={color} />;
           },
         }}
-      />
+      /> */}
     </BottomTab.Navigator>
   );
 };
 
+let persistor = persistStore(Store);
 export default function App() {
   const animation = ["slide_from_right", "slide_from_left"];
   return (
     <>
       <Provider store={Store}>
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-              animation: "slide_from_right",
-            }}
-          >
-            <Stack.Screen name="Main" component={BottomTabNavigator} />
-            <Stack.Screen name="Details" component={Details} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <PersistGate persistor={persistor}>
+          <NavigationContainer>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+                animation: "slide_from_right",
+              }}
+            >
+              <Stack.Screen name="Main" component={BottomTabNavigator} />
+              <Stack.Screen name="Details" component={Details} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </PersistGate>
       </Provider>
     </>
   );

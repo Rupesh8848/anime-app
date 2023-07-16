@@ -88,11 +88,15 @@ export const fetchSearchAnime = createAsyncThunk(
     console.log(
       `https://api.consumet.org/anime/gogoanime/${query}?page=${pageNum}`
     );
+
+    console.log("Current Fetch Page: ", pageNum, query);
+
+    dispatch(resetSearchData());
     try {
       const response = await axios.get(
         //anime info
-        `https://api.consumet.org/anime/gogoanime/${query}?page=${pageNum}`,
-        { params: { page: pageNum, type: 1 } }
+        `https://api.consumet.org/anime/gogoanime/${query}?page=${pageNum}`
+        // { params: { page: pageNum, type: 1 } }
       );
 
       console.log(response.data);
@@ -108,12 +112,53 @@ const initialState = {
   topAiring: { loading: false, error: null, data: {} },
   animeInfo: { loading: false, error: null, data: {} },
   searchData: { loading: false, error: null, data: {} },
+  favourites: [],
+  recentFive: [],
 };
 
 const animeSlice = createSlice({
   name: "Anime",
   initialState,
-  reducers: {},
+  reducers: {
+    resetSearchData: (state, action) => {
+      state.searchData.data = {};
+    },
+    toggleFavourite: (state, action) => {
+      const isFav = state.favourites?.findIndex((anime) => {
+        return anime.id === action.payload.id;
+      });
+
+      if (isFav === -1) {
+        state.favourites.push(action.payload);
+      } else {
+        const newFavList = state.favourites.filter((fav) => {
+          return fav.id !== action.payload.id;
+        });
+        state.favourites = newFavList;
+      }
+      console.log(state.favourites);
+    },
+    addToRecentFive: (state, action) => {
+      // console.log(state);
+      state.recentFive.push(action.payload);
+      const index = state.recentFive?.findIndex(
+        (show) => show.id === action.payload.id
+      );
+      if (index === -1) {
+        state.recentFive?.unshift(action.payload);
+      } else {
+        state.recentFive = [
+          action.payload,
+          ...state.recentFive?.slice(0, index),
+          ...state.recentFive?.slice(index + 1),
+        ];
+      }
+      if (state.recentFive.length > 5) {
+        state.recentFive = state.recentFive.slice(0, 5);
+      }
+      console.log(state.recentFive);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchLatestEpisodes.pending, (state, action) => {
@@ -178,3 +223,5 @@ export default animeSlice.reducer;
 //   updateServer,
 //   updateQuality,
 // } = animeSlice.actions;
+export const { resetSearchData, toggleFavourite, addToRecentFive } =
+  animeSlice.actions;
